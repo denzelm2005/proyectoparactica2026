@@ -43,7 +43,7 @@ const Encabezado = () => {
       <Nav className="ms-auto pe-2">
         <Nav.Link
           onClick={() => manejarNavegacion("/login")}
-          className={mostrarMenu ? "color-texto-marca" : "text-white"}
+          className={mostrarMenu ? "color-texto-marca" : "text-black"}
         >
           <i className="bi-person-fill-lock me-2"></i>
           Iniciar sesión
@@ -55,7 +55,7 @@ const Encabezado = () => {
       <Nav className="ms-auto pe-2">
         <Nav.Link
           onClick={() => manejarNavegacion("/catalogo")}
-          className={mostrarMenu ? "color-texto-marca" : "text-white"}
+          className={mostrarMenu ? "color-texto-marca" : "text-black"}
         >
           <i className="bi-images me-2"></i>
           <strong>Catálogo</strong>
@@ -68,7 +68,7 @@ const Encabezado = () => {
         <Nav className="ms-auto pe-2">
           <Nav.Link
             onClick={() => manejarNavegacion("/")}
-            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+            className={mostrarMenu ? "color-texto-marca" : "text-black"}
           >
             {mostrarMenu ? <i className="bi-house-fill me-2"></i> : null}
             <strong>Inicio</strong>
@@ -76,7 +76,7 @@ const Encabezado = () => {
 
           <Nav.Link
             onClick={() => manejarNavegacion("/categorias")}
-            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+            className={mostrarMenu ? "color-texto-marca" : "text-black"}
           >
             {mostrarMenu ? <i className="bi-bookmark-fill me-2"></i> : null}
             <strong>Categorías</strong>
@@ -84,7 +84,7 @@ const Encabezado = () => {
 
           <Nav.Link
             onClick={() => manejarNavegacion("/productos")}
-            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+            className={mostrarMenu ? "color-texto-marca" : "text-black"}
           >
             {mostrarMenu ? <i className="bi-bag-heart-fill me-2"></i> : null}
             <strong>Productos</strong>
@@ -93,7 +93,7 @@ const Encabezado = () => {
           {/* Opción para ir al catálogo público desde admin */}
           <Nav.Link
             onClick={() => manejarNavegacion("/catalogo")}
-            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+            className={mostrarMenu ? "color-texto-marca" : "text-black"}
           >
             {mostrarMenu ? <i className="bi-images me-2"></i> : null}
             <strong>Catálogo</strong>
@@ -105,7 +105,7 @@ const Encabezado = () => {
           {!mostrarMenu && (
             <Nav.Link
               onClick={cerrarSesion}
-              className={mostrarMenu ? "color-texto-marca" : "text-white"}
+              className={mostrarMenu ? "color-texto-marca" : "text-black"}
             >
               <i className="bi-box-arrow-right me-2"></i>
             </Nav.Link>
@@ -140,7 +140,7 @@ const Encabezado = () => {
       <Container>
         <Navbar.Brand
           onClick={() => manejarNavegacion(esCatalogo ? "/catalogo" : "/")}
-          className="text-white fw-bold d-flex align-items-center"
+          className="text-black fw-bold d-flex align-items-center"
           style={{ cursor: "pointer" }}
         >
           <img
