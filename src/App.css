@@ -7,3 +7,8 @@
   background-color: aqua !important;
   background-image: linear-gradient(90deg,#121696 0%,#288966 50%,#2697cc 100%);
 }
+
+.color-texto-marca {
+  color: #1e3d87 !important;
+  font-size: 18px;
+}
