@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react"; // Actualizado [cite: 42, 43]
-import { Container, Row, Col, Button, Spinner } from "react-bootstrap"; // Actualizado [cite: 44]
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig";
 
 import ModalRegistroCategoria from "../components/categorias/ModalRegistroCategoria";
 import NotificacionOperacion from "../components/NotificacionOperacion";
-import TablaCategorias from "../components/categorias/TablaCategorias"; // Importación necesaria para la tabla [cite: 51]
+import TablaCategorias from "../components/categorias/TablaCategorias";
+import TarjetaCategoria from "../components/categorias/TarjetaCategoria"; // Importación del componente de tarjetas
 
 const Categorias = () => {
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
@@ -15,7 +16,7 @@ const Categorias = () => {
     descripcion_categoria: "",
   });
 
-  // --- Nuevas variables de estado según la guía  ---
+  // --- Variables de estado ---
   const [categorias, setCategorias] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [mostrarModalEliminacion, setMostrarModalEliminacion] = useState(false);
@@ -27,7 +28,7 @@ const Categorias = () => {
     descripcion_categoria: "",
   });
 
-  // --- Métodos de carga y control [cite: 46, 47] ---
+  // --- Métodos de carga y control ---
   const cargarCategorias = async () => {
     try {
       setCargando(true);
@@ -72,7 +73,7 @@ const Categorias = () => {
     setMostrarModalEliminacion(true);
   };
 
-  // --- Hook de carga inicial [cite: 48, 49, 50, 51] ---
+  // --- Hook de carga inicial ---
   useEffect(() => {
     cargarCategorias();
   }, []);
@@ -116,14 +117,12 @@ const Categorias = () => {
         return;
       }
 
-      // Éxito
       setToast({
         mostrar: true,
         mensaje: `Categoría "${nuevaCategoria.nombre_categoria}" registrada exitosamente.`,
         tipo: "exito",
       });
 
-      // Limpiar formulario, cerrar modal y RECARGAR datos [cite: 53, 54]
       setNuevaCategoria({ nombre_categoria: "", descripcion_categoria: "" });
       setMostrarModal(false);
       await cargarCategorias(); 
@@ -157,7 +156,7 @@ const Categorias = () => {
 
       <hr />
 
-      {/* --- Bloques condicionales de carga y visualización [cite: 51, 52] --- */}
+      {/* --- Bloques condicionales de carga --- */}
       {cargando && (
         <Row className="text-center my-5">
           <Col>
@@ -167,10 +166,21 @@ const Categorias = () => {
         </Row>
       )}
 
+      {/* --- Visualización Responsiva --- */}
       {!cargando && categorias.length > 0 && (
         <Row>
+          {/* VISTA TABLA: Visible solo en pantallas LG (Escritorio) */}
           <Col lg={12} className="d-none d-lg-block">
             <TablaCategorias
+              categorias={categorias}
+              abrirModalEdicion={abrirModalEdicion}
+              abrirModalEliminacion={abrirModalEliminacion}
+            />
+          </Col>
+
+          {/* VISTA TARJETAS: Visible en móviles y tablets (XS, SM, MD) */}
+          <Col xs={12} sm={12} md={12} className="d-lg-none">
+            <TarjetaCategoria
               categorias={categorias}
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
