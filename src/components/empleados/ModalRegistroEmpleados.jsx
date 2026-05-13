@@ -1,31 +1,31 @@
 import React, { useState } from "react";
 import { Modal, Form, Button, Row, Col } from "react-bootstrap";
 
-const ModalEdicionEmpleado = ({
-  mostrarModalEdicion,
-  setMostrarModalEdicion,
-  empleadoEditar,
-  setEmpleadoEditar,
-  actualizarEmpleado
+const ModalRegistroEmpleado = ({
+  mostrarModal,
+  setMostrarModal,
+  nuevoEmpleado,
+  setNuevoEmpleado,
+  agregarEmpleado
 }) => {
   const [deshabilitado, setDeshabilitado] = useState(false);
 
   const manejoCambio = (e) => {
     const { name, value } = e.target;
-    setEmpleadoEditar(prev => ({ ...prev, [name]: value }));
+    setNuevoEmpleado(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleActualizar = async () => {
+  const handleGuardar = async () => {
     if (deshabilitado) return;
     setDeshabilitado(true);
-    await actualizarEmpleado();
+    await agregarEmpleado();
     setDeshabilitado(false);
   };
 
   return (
-    <Modal show={mostrarModalEdicion} onHide={() => setMostrarModalEdicion(false)} backdrop="static" centered>
+    <Modal show={mostrarModal} onHide={() => setMostrarModal(false)} backdrop="static" centered>
       <Modal.Header closeButton>
-        <Modal.Title>Editar Empleado</Modal.Title>
+        <Modal.Title>Nuevo Empleado</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
@@ -36,8 +36,9 @@ const ModalEdicionEmpleado = ({
                 <Form.Control
                   type="text"
                   name="nombre_empleado"
-                  value={empleadoEditar.nombre_empleado}
+                  value={nuevoEmpleado.nombre_empleado}
                   onChange={manejoCambio}
+                  placeholder="Nombre"
                 />
               </Form.Group>
             </Col>
@@ -47,19 +48,33 @@ const ModalEdicionEmpleado = ({
                 <Form.Control
                   type="text"
                   name="apellido_empleado"
-                  value={empleadoEditar.apellido_empleado}
+                  value={nuevoEmpleado.apellido_empleado}
                   onChange={manejoCambio}
+                  placeholder="Apellido"
                 />
               </Form.Group>
             </Col>
           </Row>
 
           <Form.Group className="mb-3">
-            <Form.Label>Email (no editable)</Form.Label>
+            <Form.Label>Email (Usuario de acceso) *</Form.Label>
             <Form.Control
               type="email"
-              value={empleadoEditar.email}
-              disabled
+              name="email"
+              value={nuevoEmpleado.email}
+              onChange={manejoCambio}
+              placeholder="ejemplo@discosa.com"
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Contraseña *</Form.Label>
+            <Form.Control
+              type="password"
+              name="password"
+              value={nuevoEmpleado.password}
+              onChange={manejoCambio}
+              placeholder="Contraseña de acceso"
             />
           </Form.Group>
 
@@ -70,8 +85,9 @@ const ModalEdicionEmpleado = ({
                 <Form.Control
                   type="text"
                   name="celular"
-                  value={empleadoEditar.celular}
+                  value={nuevoEmpleado.celular}
                   onChange={manejoCambio}
+                  placeholder="Número de celular"
                 />
               </Form.Group>
             </Col>
@@ -81,8 +97,9 @@ const ModalEdicionEmpleado = ({
                 <Form.Control
                   type="text"
                   name="pin"
-                  value={empleadoEditar.pin}
+                  value={nuevoEmpleado.pin}
                   onChange={manejoCambio}
+                  placeholder="PIN"
                   maxLength={6}
                 />
               </Form.Group>
@@ -93,9 +110,10 @@ const ModalEdicionEmpleado = ({
             <Form.Label>Rol / Tipo de Empleado *</Form.Label>
             <Form.Select
               name="tipo_empleado"
-              value={empleadoEditar.tipo_empleado}
+              value={nuevoEmpleado.tipo_empleado}
               onChange={manejoCambio}
             >
+              <option value="">Selecciona un rol</option>
               <option value="administrador">Administrador</option>
               <option value="cajero">Cajero</option>
               <option value="mesero">Mesero</option>
@@ -105,20 +123,19 @@ const ModalEdicionEmpleado = ({
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={() => setMostrarModalEdicion(false)}>
+        <Button variant="secondary" onClick={() => setMostrarModal(false)}>
           Cancelar
         </Button>
         <Button 
           variant="primary" 
-          onClick={handleActualizar}
+          onClick={handleGuardar}
           disabled={deshabilitado}
         >
-          {deshabilitado ? "Actualizando..." : "Actualizar Empleado"}
+          {deshabilitado ? "Guardando..." : "Guardar Empleado"}
         </Button>
       </Modal.Footer>
     </Modal>
   );
 };
 
-export default ModalEdicionEmpleado;
-
+export default ModalRegistroEmpleado;

@@ -1,48 +1,45 @@
-import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Spinner, Alert } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Container, Row, Col, Button, Alert, Spinner } from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig";
 
-import ModalRegistroEmpleado from "../components/empleados/ModalRegistroEmpleado";
-import NotificacionOperacion from "../components/NotificacionOperacion";
+import ModalRegistroEmpleado from "../components/empleados/ModalRegistroEmpleados";
+import ModalEdicionEmpleado from "../components/empleados/ModalEdicionEmpleado";
 import TablaEmpleados from "../components/empleados/TablaEmpleados";
 import TarjetaEmpleado from "../components/empleados/TarjetaEmpleado";
-import ModalEdicionEmpleado from "../components/empleados/ModalEdicionEmpleado";
-import ModalEliminacionEmpleado from "../components/empleados/ModalEliminacionEmpleado";
+import NotificacionOperacion from "../components/NotificacionOperacion";
 import CuadroBusquedas from "../components/busquedas/CuadroBusquedas";
-import Paginacion from "../components/Ordenamiento/Paginacion";
 
 const Empleados = () => {
-  const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
+  const [empleados, setEmpleados] = useState([]);
+  const [empleadosFiltrados, setEmpleadosFiltrados] = useState([]);
+  const [textoBusqueda, setTextoBusqueda] = useState("");
+  const [cargando, setCargando] = useState(true);   // ← Estado de carga inicial
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
+
+  const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
 
   const [nuevoEmpleado, setNuevoEmpleado] = useState({
-    nombre: "",
-    apellido: "",
-    pin_acceso: "",
+    nombre_empleado: "",
+    apellido_empleado: "",
+    celular: "",
+    pin: "",
+    email: "",
+    password: "",
     tipo_empleado: "",
   });
 
-  // --- Variables de estado ---
-  const [empleados, setEmpleados] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [mostrarModalEliminacion, setMostrarModalEliminacion] = useState(false);
-  const [empleadoAEliminar, setEmpleadoAEliminar] = useState(null);
-  const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
   const [empleadoEditar, setEmpleadoEditar] = useState({
     id_empleado: "",
-    nombre: "",
-    apellido: "",
-    pin_acceso: "",
+    nombre_empleado: "",
+    apellido_empleado: "",
+    celular: "",
+    pin: "",
+    email: "",
     tipo_empleado: "",
   });
 
-  const [textoBusqueda, setTextoBusqueda] = useState("");
-  const [empleadosFiltrados, setEmpleadosFiltrados] = useState([]);
-
-  const [registrosPorPagina, establecerRegistrosPorPagina] = useState(10);
-  const [paginaActual, establecerPaginaActual] = useState(1);
-
-  // --- Métodos de carga y control ---
+  // Cargar empleados
   const cargarEmpleados = async () => {
     try {
       setCargando(true);
@@ -52,182 +49,163 @@ const Empleados = () => {
         .order("id_empleado", { ascending: true });
 
       if (error) {
-        console.error("Error al cargar empleados:", error.message);
-        setToast({
-          mostrar: true,
-          mensaje: "Error al cargar empleados.",
-          tipo: "error",
-        });
+        setToast({ mostrar: true, mensaje: "Error al cargar empleados", tipo: "error" });
         return;
       }
       setEmpleados(data || []);
+      setEmpleadosFiltrados(data || []);
     } catch (err) {
-      console.error("Excepción al cargar empleados:", err.message);
-      setToast({
-        mostrar: true,
-        mensaje: "Error inesperado al cargar empleados.",
-        tipo: "error",
-      });
+      setToast({ mostrar: true, mensaje: "Error inesperado al cargar empleados", tipo: "error" });
     } finally {
       setCargando(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarEmpleados();
+  }, []);
+
+  // Filtrado
+  useEffect(() => {
+    if (!textoBusqueda.trim()) {
+      setEmpleadosFiltrados(empleados);
+    } else {
+      const texto = textoBusqueda.toLowerCase().trim();
+      const filtrados = empleados.filter(emp =>
+        `${emp.nombre_empleado} ${emp.apellido_empleado} ${emp.email || ""} ${emp.tipo_empleado || ""}`
+          .toLowerCase().includes(texto)
+      );
+      setEmpleadosFiltrados(filtrados);
+    }
+  }, [textoBusqueda, empleados]);
+
+  const agregarEmpleado = async () => {
+    if (!nuevoEmpleado.nombre_empleado || !nuevoEmpleado.apellido_empleado ||
+        !nuevoEmpleado.email || !nuevoEmpleado.password || !nuevoEmpleado.tipo_empleado) {
+      setToast({ mostrar: true, mensaje: "Los campos Nombre, Apellido, Email, Contraseña y Rol son obligatorios", tipo: "advertencia" });
+      return;
+    }
+
+    try {
+      setMostrarModal(false);
+
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: nuevoEmpleado.email,
+        password: nuevoEmpleado.password,
+        options: {
+          data: {
+            nombre: nuevoEmpleado.nombre_empleado,
+            apellido: nuevoEmpleado.apellido_empleado,
+          }
+        }
+      });
+
+      if (authError) throw authError;
+
+      const { error: dbError } = await supabase.from("empleados").insert([{
+        nombre_empleado: nuevoEmpleado.nombre_empleado,
+        apellido_empleado: nuevoEmpleado.apellido_empleado,
+        celular: nuevoEmpleado.celular,
+        pin: nuevoEmpleado.pin,
+        email: nuevoEmpleado.email,
+        tipo_empleado: nuevoEmpleado.tipo_empleado,
+      }]);
+
+      if (dbError) throw dbError;
+
+      await cargarEmpleados();
+      setNuevoEmpleado({ nombre_empleado: "", apellido_empleado: "", celular: "", pin: "", email: "", password: "", tipo_empleado: "" });
+
+      setToast({
+        mostrar: true,
+        mensaje: `Empleado ${nuevoEmpleado.nombre_empleado} registrado correctamente`,
+        tipo: "exito"
+      });
+    } catch (err) {
+      console.error(err);
+      setToast({ mostrar: true, mensaje: err.message || "Error al registrar empleado", tipo: "error" });
+    }
+  };
+
+  const actualizarEmpleado = async () => {
+    if (!empleadoEditar.nombre_empleado || !empleadoEditar.apellido_empleado ||
+        !empleadoEditar.tipo_empleado) {
+      setToast({ mostrar: true, mensaje: "Nombre, Apellido y Rol son obligatorios", tipo: "advertencia" });
+      return;
+    }
+
+    try {
+      setMostrarModalEdicion(false);
+      const { error } = await supabase
+        .from("empleados")
+        .update({
+          nombre_empleado: empleadoEditar.nombre_empleado,
+          apellido_empleado: empleadoEditar.apellido_empleado,
+          celular: empleadoEditar.celular,
+          pin: empleadoEditar.pin,
+          tipo_empleado: empleadoEditar.tipo_empleado,
+        })
+        .eq("id_empleado", empleadoEditar.id_empleado);
+
+      if (error) throw error;
+
+      await cargarEmpleados();
+      setToast({
+        mostrar: true,
+        mensaje: `Empleado ${empleadoEditar.nombre_empleado} actualizado`,
+        tipo: "exito"
+      });
+    } catch (err) {
+      setToast({ mostrar: true, mensaje: "Error al actualizar empleado", tipo: "error" });
     }
   };
 
   const abrirModalEdicion = (empleado) => {
     setEmpleadoEditar({
       id_empleado: empleado.id_empleado,
-      nombre: empleado.nombre,
-      apellido: empleado.apellido,
-      pin_acceso: empleado.pin_acceso,
+      nombre_empleado: empleado.nombre_empleado,
+      apellido_empleado: empleado.apellido_empleado,
+      celular: empleado.celular || "",
+      pin: empleado.pin || "",
+      email: empleado.email || "",
       tipo_empleado: empleado.tipo_empleado,
     });
     setMostrarModalEdicion(true);
   };
 
-  const manejoCambioInputEdicion = (e) => {
-    const { name, value } = e.target;
-    setEmpleadoEditar((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const manejarBusqueda = (e) => {
-    setTextoBusqueda(e.target.value);
-    establecerPaginaActual(1); 
-  };
-
-  const abrirModalEliminacion = (empleado) => {
-    setEmpleadoAEliminar(empleado);
-    setMostrarModalEliminacion(true);
-  };
-
-  // --- Lógica de Paginación ---
-  const empleadosPaginados = empleadosFiltrados.slice(
-    (paginaActual - 1) * registrosPorPagina,
-    paginaActual * registrosPorPagina
-  );
-
-  // --- Hook de carga inicial ---
-  useEffect(() => {
-    cargarEmpleados();
-  }, []);
-
-  const manejoCambioInput = (e) => {
-    const { name, value } = e.target;
-    setNuevoEmpleado((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const actualizarEmpleado = async () => {
-    try {
-      if (!empleadoEditar.nombre.trim() || !empleadoEditar.pin_acceso.trim()) {
-        setToast({ mostrar: true, mensaje: "Debe llenar los campos obligatorios.", tipo: "advertencia" });
-        return;
-      }
-      setMostrarModalEdicion(false);
-      const { error } = await supabase
-        .from("empleados")
-        .update({
-          nombre: empleadoEditar.nombre,
-          apellido: empleadoEditar.apellido,
-          pin_acceso: empleadoEditar.pin_acceso,
-          tipo_empleado: empleadoEditar.tipo_empleado,
-        })
-        .eq("id_empleado", empleadoEditar.id_empleado);
-
-      if (error) throw error;
-      await cargarEmpleados();
-      setToast({ mostrar: true, mensaje: `Empleado actualizado exitosamente.`, tipo: "exito" });
-    } catch (err) {
-      setToast({ mostrar: true, mensaje: "Error al actualizar empleado.", tipo: "error" });
-    }
-  };
-
-  const eliminarEmpleado = async () => {
-    if (!empleadoAEliminar) return;
-    try {
-      setMostrarModalEliminacion(false);
-      const { error } = await supabase
-        .from("empleados")
-        .delete()
-        .eq("id_empleado", empleadoAEliminar.id_empleado);
-
-      if (error) throw error;
-      await cargarEmpleados();
-      setToast({ mostrar: true, mensaje: `Empleado eliminado exitosamente.`, tipo: "exito" });
-    } catch (err) {
-      setToast({ mostrar: true, mensaje: "Error al eliminar empleado.", tipo: "error" });
-    }
-  };
-
-  const agregarEmpleado = async () => {
-    try {
-      if (!nuevoEmpleado.nombre.trim() || !nuevoEmpleado.pin_acceso.trim()) {
-        setToast({ mostrar: true, mensaje: "Debe llenar los campos obligatorios.", tipo: "advertencia" });
-        return;
-      }
-      const { error } = await supabase.from("empleados").insert([nuevoEmpleado]);
-      if (error) throw error;
-
-      setToast({ mostrar: true, mensaje: "Empleado registrado exitosamente.", tipo: "exito" });
-      setNuevoEmpleado({ nombre: "", apellido: "", pin_acceso: "", tipo_empleado: "" });
-      setMostrarModal(false);
-      await cargarEmpleados();
-    } catch (err) {
-      setToast({ mostrar: true, mensaje: "Error al registrar empleado.", tipo: "error" });
-    }
-  };
-
-  // --- Hook para Filtrado en tiempo real ---
-  useEffect(() => {
-    if (!textoBusqueda.trim()) {
-      setEmpleadosFiltrados(empleados);
-    } else {
-      const textoLower = textoBusqueda.toLowerCase().trim();
-      const filtrados = empleados.filter(
-        (emp) =>
-          emp.nombre.toLowerCase().includes(textoLower) ||
-          emp.apellido.toLowerCase().includes(textoLower) ||
-          (emp.tipo_empleado && emp.tipo_empleado.toLowerCase().includes(textoLower))
-      );
-      setEmpleadosFiltrados(filtrados);
-    }
-  }, [textoBusqueda, empleados]);
-
   return (
     <Container className="mt-3">
-      {/* Título y botón Nuevo Empleado */}
       <Row className="align-items-center mb-3">
-        <Col xs={9} sm={7} md={7} lg={7} className="d-flex align-items-center">
-          <h3 className="mb-0">
-            <i className="bi bi-person-badge-fill me-2"></i> Empleados
-          </h3>
+        <Col>
+          <h3><i className="bi-person-badge-fill me-2"></i>Empleados</h3>
         </Col>
-        <Col xs={3} sm={5} md={5} lg={5} className="text-end">
-          <Button onClick={() => setMostrarModal(true)} size="md">
-            <i className="bi bi-plus-lg"></i>
-            <span className="d-none d-sm-inline ms-2">Nuevo Empleado</span>
+        <Col className="text-end">
+          <Button onClick={() => setMostrarModal(true)}>
+            <i className="bi-plus-lg me-1"></i>Nuevo Empleado
           </Button>
         </Col>
       </Row>
 
-      <hr />
-
-      {/* Cuadro de búsqueda */}
       <Row className="mb-4">
-        <Col md={6} lg={5}>
+        <Col md={6}>
           <CuadroBusquedas
             textoBusqueda={textoBusqueda}
-            manejarCambioBusqueda={manejarBusqueda}
-            placeholder="Buscar por nombre, apellido o cargo..."
+            manejarCambioBusqueda={(e) => setTextoBusqueda(e.target.value)}
           />
         </Col>
       </Row>
 
-      {/* Mensaje de no coincidencias */}
+      {/* Spinner de carga inicial */}
+      {cargando && (
+        <Row className="text-center my-5">
+          <Col>
+            <Spinner animation="border" variant="success" size="lg" />
+            <p className="mt-3 text-muted">Cargando empleados...</p>
+          </Col>
+        </Row>
+      )}
+
+      {/* Alert cuando no hay coincidencias en la búsqueda */}
       {!cargando && textoBusqueda.trim() && empleadosFiltrados.length === 0 && (
         <Row className="mb-4">
           <Col>
@@ -239,48 +217,22 @@ const Empleados = () => {
         </Row>
       )}
 
-      {/* Bloques de carga */}
-      {cargando && (
-        <Row className="text-center my-5">
-          <Col>
-            <Spinner animation="border" variant="success" size="lg" />
-            <p className="mt-3 text-muted">Cargando empleados...</p>
-          </Col>
-        </Row>
-      )}
-
-      {/* Visualización Responsiva Paginada */}
-      {!cargando && empleadosPaginados.length > 0 && (
+      {/* Mostrar tabla o tarjetas solo cuando hay resultados y ya cargó */}
+      {!cargando && empleadosFiltrados.length > 0 && (
         <Row>
-          {/* VISTA TARJETAS: Móvil/Tablet */}
           <Col xs={12} className="d-lg-none">
             <TarjetaEmpleado
-              empleados={empleadosPaginados}
+              empleados={empleadosFiltrados}
               abrirModalEdicion={abrirModalEdicion}
-              abrirModalEliminacion={abrirModalEliminacion}
             />
           </Col>
-
-          {/* VISTA TABLA: Escritorio */}
           <Col lg={12} className="d-none d-lg-block">
             <TablaEmpleados
-              empleados={empleadosPaginados}
+              empleados={empleadosFiltrados}
               abrirModalEdicion={abrirModalEdicion}
-              abrirModalEliminacion={abrirModalEliminacion}
             />
           </Col>
         </Row>
-      )}
-
-      {/* Paginación */}
-      {!cargando && empleadosFiltrados.length > 0 && (
-        <Paginacion
-          registrosPorPagina={registrosPorPagina}
-          totalRegistros={empleadosFiltrados.length}
-          paginaActual={paginaActual}
-          establecerPaginaActual={establecerPaginaActual}
-          establecerRegistrosPorPagina={establecerRegistrosPorPagina}
-        />
       )}
 
       {/* Modales */}
@@ -288,7 +240,7 @@ const Empleados = () => {
         mostrarModal={mostrarModal}
         setMostrarModal={setMostrarModal}
         nuevoEmpleado={nuevoEmpleado}
-        manejoCambioInput={manejoCambioInput}
+        setNuevoEmpleado={setNuevoEmpleado}
         agregarEmpleado={agregarEmpleado}
       />
 
@@ -296,18 +248,10 @@ const Empleados = () => {
         mostrarModalEdicion={mostrarModalEdicion}
         setMostrarModalEdicion={setMostrarModalEdicion}
         empleadoEditar={empleadoEditar}
-        manejoCambioInputEdicion={manejoCambioInputEdicion}
+        setEmpleadoEditar={setEmpleadoEditar}
         actualizarEmpleado={actualizarEmpleado}
       />
 
-      <ModalEliminacionEmpleado
-        mostrarModalEliminacion={mostrarModalEliminacion}
-        setMostrarModalEliminacion={setMostrarModalEliminacion}
-        eliminarEmpleado={eliminarEmpleado}
-        empleado={empleadoAEliminar}
-      />
-
-      {/* Notificación */}
       <NotificacionOperacion
         mostrar={toast.mostrar}
         mensaje={toast.mensaje}
