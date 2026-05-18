@@ -1,47 +1,38 @@
-// ================================================
-// 2. Vista: Login.jsx (o pages/Login.jsx)
-// (Crea este archivo en: src/views/Login.jsx o src/pages/Login.jsx)
-// ================================================
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import FormularioLogin from "../components/login/FormularioLogin";   // ← Ajusta la ruta según tu carpeta
-import { supabase } from "../database/supabaseconfig";       // ← Ajusta la ruta según tu proyecto
+import FormularioLogin from "../components/login/FormularioLogin";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
-  // Variables de estado
   const [usuario, setUsuario] = useState("");
-  const [contraseña, setContraseña] = useState("");
-  const [error, setError] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [error, setError] = useState(null);
+  const [cargando, setCargando] = useState(false);
 
-  // Hook de navegación
   const navegar = useNavigate();
+  const { login } = useAuth();
 
-  // Función para iniciar sesión con Supabase
   const iniciarSesion = async () => {
+    if (!usuario || !contrasena) {
+      setError("Por favor ingresa usuario y contraseña");
+      return;
+    }
+
+    setCargando(true);
+    setError(null);
+
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: usuario,
-        password: contraseña,
-      });
-
-      if (authError) {
-        setError("Usuario o contraseña incorrectos");
-        return;
-      }
-
-      if (data.user) {
-        // Guardamos en localStorage (como indica la guía)
-        localStorage.setItem("usuario-supabase", usuario);
-        navegar("/");   // Redirige al dashboard o página principal
-      }
+      await login(usuario, contrasena);
+      navegar("/");
     } catch (err) {
-      setError("Error al conectar con el servidor");
-      console.error("Error en la solicitud:", err);
+      console.error(err);
+      setError("Usuario o contraseña incorrectos");
+    } finally {
+      setCargando(false);
     }
   };
 
-  // useEffect para verificar si ya hay sesión activa
+  // Redirigir si ya está logueado
   useEffect(() => {
     const usuarioGuardado = localStorage.getItem("usuario-supabase");
     if (usuarioGuardado) {
@@ -49,17 +40,16 @@ const Login = () => {
     }
   }, [navegar]);
 
-  // Estilos del contenedor (fondo degradado)
   const estiloContenedor = {
     position: "fixed",
-    top: "0",
-    left: "0",
+    top: 0,
+    left: 0,
     width: "100%",
-    height: "100%",
+    height: "100vh",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "linear-gradient(135deg, #FFDEA9, #B5FFFC)", // corregí el hex incompleto de la guía
+    background: "linear-gradient(135deg, #FFDEE9, #B5FFFC)",
     overflow: "hidden",
     padding: "20px",
   };
@@ -68,11 +58,12 @@ const Login = () => {
     <div style={estiloContenedor}>
       <FormularioLogin
         usuario={usuario}
-        contraseña={contraseña}
+        contrasena={contrasena}
         error={error}
         setUsuario={setUsuario}
-        setContraseña={setContraseña}
-        iniciarSesión={iniciarSesion}
+        setContrasena={setContrasena}
+        iniciarSesion={iniciarSesion}
+        cargando={cargando}
       />
     </div>
   );
