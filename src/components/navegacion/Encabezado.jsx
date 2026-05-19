@@ -3,11 +3,16 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Container, Nav, Navbar, Offcanvas } from "react-bootstrap";
 import logo from "../../assets/logo.png";
 import { supabase } from "../../database/supabaseconfig";
+// Importar el hook de autenticación
+import { useAuth } from "../../context/AuthContext";
 
 const Encabezado = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const navigate = useNavigate();
   const location = useLocation(); // Para detectar la ruta actual
+
+  // Desestructurar la lógica para verificar permisos, cierre de sesión y usuario autenticado
+  const { tienePermiso, logout, usuario } = useAuth();
 
   const manejarToggle = () => setMostrarMenu(!mostrarMenu);
 
@@ -16,12 +21,10 @@ const Encabezado = () => {
     setMostrarMenu(false);
   };
 
+  // Actualizar la función cerrarSesion usando la función logout del contexto
   const cerrarSesion = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
-      localStorage.removeItem("usuario-supabase");
+      await logout();
       setMostrarMenu(false);
       navigate("/login");
     } catch (err) {
@@ -66,54 +69,78 @@ const Encabezado = () => {
     contenidoMenu = (
       <>
         <Nav className="ms-auto pe-2">
-          <Nav.Link
-            onClick={() => manejarNavegacion("/")}
-            className={mostrarMenu ? "color-texto-marca" : "text-black"}
-          >
-            {mostrarMenu ? <i className="bi-house-fill me-2"></i> : null}
-            <strong>Inicio</strong>
-          </Nav.Link>
-
-          <Nav.Link
-            onClick={() => manejarNavegacion("/categorias")}
-            className={mostrarMenu ? "color-texto-marca" : "text-black"}
-          >
-            {mostrarMenu ? <i className="bi-bookmark-fill me-2"></i> : null}
-            <strong>Categorías</strong>
-          </Nav.Link>
-
-          <Nav.Link
-            onClick={() => manejarNavegacion("/productos")}
-            className={mostrarMenu ? "color-texto-marca" : "text-black"}
-          >
-            {mostrarMenu ? <i className="bi-bag-heart-fill me-2"></i> : null}
-            <strong>Productos</strong>
-          </Nav.Link>
-
+          {/* Validar y envolver las opciones de navegación empleando tienePermiso */}
+          {tienePermiso("ver_inicio") && (
             <Nav.Link
-            onClick={() => manejarNavegacion("/cliente")}
-            className={mostrarMenu ? "color-texto-marca" : "text-black"}
-          >
-            {mostrarMenu ? <i className="bi-bag-heart-fill me-2"></i> : null}
-            <strong>Clientes</strong>
-          </Nav.Link>
+              onClick={() => manejarNavegacion("/")}
+              className={mostrarMenu ? "color-texto-marca" : "text-black"}
+            >
+              {mostrarMenu ? <i className="bi-house-fill me-2"></i> : null}
+              <strong>Inicio</strong>
+            </Nav.Link>
+          )}
 
+          {tienePermiso("ver_categorias") && (
             <Nav.Link
-            onClick={() => manejarNavegacion("/empleado")}
-            className={mostrarMenu ? "color-texto-marca" : "text-black"}
-          >
-            {mostrarMenu ? <i className="bi-bag-heart-fill me-2"></i> : null}
-            <strong>Empleados</strong>
-          </Nav.Link>
+              onClick={() => manejarNavegacion("/categorias")}
+              className={mostrarMenu ? "color-texto-marca" : "text-black"}
+            >
+              {mostrarMenu ? <i className="bi-bookmark-fill me-2"></i> : null}
+              <strong>Categorías</strong>
+            </Nav.Link>
+          )}
+
+          {tienePermiso("ver_productos") && (
+            <Nav.Link
+              onClick={() => manejarNavegacion("/productos")}
+              className={mostrarMenu ? "color-texto-marca" : "text-black"}
+            >
+              {mostrarMenu ? <i className="bi-bag-heart-fill me-2"></i> : null}
+              <strong>Productos</strong>
+            </Nav.Link>
+          )}
+
+          {tienePermiso("ver_clientes") && (
+            <Nav.Link
+              onClick={() => manejarNavegacion("/cliente")}
+              className={mostrarMenu ? "color-texto-marca" : "text-black"}
+            >
+              {mostrarMenu ? <i className="bi-bag-heart-fill me-2"></i> : null}
+              <strong>Clientes</strong>
+            </Nav.Link>
+          )}
+
+          {tienePermiso("ver_empleados") && (
+            <Nav.Link
+              onClick={() => manejarNavegacion("/empleado")}
+              className={mostrarMenu ? "color-texto-marca" : "text-black"}
+            >
+              {mostrarMenu ? <i className="bi-bag-heart-fill me-2"></i> : null}
+              <strong>Empleados</strong>
+            </Nav.Link>
+          )}
 
           {/* Opción para ir al catálogo público desde admin */}
-          <Nav.Link
-            onClick={() => manejarNavegacion("/catalogo")}
-            className={mostrarMenu ? "color-texto-marca" : "text-black"}
-          >
-            {mostrarMenu ? <i className="bi-images me-2"></i> : null}
-            <strong>Catálogo</strong>
-          </Nav.Link>
+          {tienePermiso("ver_catalogo") && (
+            <Nav.Link
+              onClick={() => manejarNavegacion("/catalogo")}
+              className={mostrarMenu ? "color-texto-marca" : "text-black"}
+            >
+              {mostrarMenu ? <i className="bi-images me-2"></i> : null}
+              <strong>Catálogo</strong>
+            </Nav.Link>
+          )}
+
+          {/* Opción para ir al permisos público desde admin */}
+          {tienePermiso("ver_permisos") && (
+            <Nav.Link
+              onClick={() => manejarNavegacion("/permisos")}
+              className={mostrarMenu ? "color-texto-marca" : "text-black"}
+            >
+              {mostrarMenu ? <i className="bi-images me-2"></i> : null}
+              <strong>Permisos</strong>
+            </Nav.Link>
+          )}
 
           <hr />
 
