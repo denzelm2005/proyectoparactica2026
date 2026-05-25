@@ -5,16 +5,12 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 const TablaClientes = ({
   clientes,
   abrirModalEdicion,
-  abrirModalEliminacion
+  abrirModalEliminacion,
 }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (clientes && clientes.length > 0) {
-      setLoading(false);
-    } else {
-      setLoading(true);
-    }
+    setLoading(!(clientes && clientes.length > 0));
   }, [clientes]);
 
   return (
@@ -31,7 +27,7 @@ const TablaClientes = ({
               <th>ID</th>
               <th>Nombre</th>
               <th>Apellido</th>
-              <th className="d-none d-md-table-cell">Celular</th>
+              <th>Celular</th>
               <th className="text-center">Acciones</th>
             </tr>
           </thead>
@@ -39,9 +35,9 @@ const TablaClientes = ({
             {clientes.map((cliente) => (
               <tr key={cliente.id_cliente}>
                 <td>{cliente.id_cliente}</td>
-                <td>{cliente.nombre}</td>
-                <td>{cliente.apellido}</td>
-                <td className="d-none d-md-table-cell">{cliente.celular}</td>
+                <td>{cliente.nombre_cliente}</td>
+                <td>{cliente.apellido_cliente || "—"}</td>
+                <td>{cliente.celular}</td>
                 <td className="text-center">
                   <Button
                     variant="outline-warning"
@@ -51,7 +47,6 @@ const TablaClientes = ({
                   >
                     <i className="bi bi-pencil"></i>
                   </Button>
-
                   <Button
                     variant="outline-danger"
                     size="sm"

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Modal, Form, Button } from 'react-bootstrap';
+import React, { useState } from "react";
+import { Modal, Form, Button } from "react-bootstrap";
 
 const ModalEdicionCliente = ({
   mostrarModalEdicion,
@@ -31,33 +31,32 @@ const ModalEdicionCliente = ({
       <Modal.Body>
         <Form>
           <Form.Group className="mb-3">
-            <Form.Label>Nombre</Form.Label>
+            <Form.Label>Nombre *</Form.Label>
             <Form.Control
               type="text"
-              name="nombre"
-              value={clienteEditar.nombre}
+              name="nombre_cliente"
+              value={clienteEditar.nombre_cliente}
               onChange={manejoCambioInputEdicion}
-              placeholder="Ingresa el nombre"
             />
           </Form.Group>
+
           <Form.Group className="mb-3">
             <Form.Label>Apellido</Form.Label>
             <Form.Control
               type="text"
-              name="apellido"
-              value={clienteEditar.apellido}
+              name="apellido_cliente"
+              value={clienteEditar.apellido_cliente}
               onChange={manejoCambioInputEdicion}
-              placeholder="Ingresa el apellido"
             />
           </Form.Group>
+
           <Form.Group className="mb-3">
-            <Form.Label>Celular</Form.Label>
+            <Form.Label>Celular *</Form.Label>
             <Form.Control
-              type="text"
+              type="tel"
               name="celular"
               value={clienteEditar.celular}
               onChange={manejoCambioInputEdicion}
-              placeholder="Ingresa el número de celular"
             />
           </Form.Group>
         </Form>
@@ -69,9 +68,9 @@ const ModalEdicionCliente = ({
         <Button
           variant="primary"
           onClick={handleActualizar}
-          disabled={clienteEditar.nombre.trim() === "" || deshabilitado}
+          disabled={!clienteEditar.nombre_cliente?.trim() || !clienteEditar.celular?.trim() || deshabilitado}
         >
-          {deshabilitado ? 'Actualizando...' : 'Actualizar'}
+          Actualizar Cliente
         </Button>
       </Modal.Footer>
     </Modal>

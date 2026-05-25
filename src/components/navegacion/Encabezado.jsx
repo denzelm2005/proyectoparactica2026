@@ -142,6 +142,17 @@ const Encabezado = () => {
             </Nav.Link>
           )}
 
+
+{/* Opción para ir al permisos público desde admin */}
+          {tienePermiso("ver_ventas") && (
+            <Nav.Link
+              onClick={() => manejarNavegacion("/ventas")}
+              className={mostrarMenu ? "color-texto-marca" : "text-black"}
+            >
+              {mostrarMenu ? <i className="bi-images me-2"></i> : null}
+              <strong>Ventas</strong>
+            </Nav.Link>
+          )}
           <hr />
 
           {/* Ícono cerrar sesión en barra superior */}

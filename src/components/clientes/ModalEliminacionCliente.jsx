@@ -28,22 +28,18 @@ const ModalEliminacionCliente = ({
         <Modal.Title>Confirmar Eliminación</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        ¿Estás seguro de que deseas eliminar al cliente "
+        ¿Estás seguro de que deseas eliminar al cliente{" "}
         <strong>
-          {cliente?.nombre} {cliente?.apellido}
+          {cliente?.nombre_cliente} {cliente?.apellido_cliente}
         </strong>
-        "? Esta acción no se puede deshacer.
+        ?
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={() => setMostrarModalEliminacion(false)}>
           Cancelar
         </Button>
-        <Button
-          variant="danger"
-          onClick={handleEliminar}
-          disabled={deshabilitado}
-        >
-          {deshabilitado ? "Eliminando..." : "Eliminar"}
+        <Button variant="danger" onClick={handleEliminar} disabled={deshabilitado}>
+          Eliminar Cliente
         </Button>
       </Modal.Footer>
     </Modal>

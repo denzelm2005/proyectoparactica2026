@@ -5,7 +5,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 const TarjetaCliente = ({
   clientes,
   abrirModalEdicion,
-  abrirModalEliminacion
+  abrirModalEliminacion,
 }) => {
   const [cargando, setCargando] = useState(true);
   const [idTarjetaActiva, setIdTarjetaActiva] = useState(null);
@@ -38,11 +38,10 @@ const TarjetaCliente = ({
         <div>
           {clientes.map((cliente) => {
             const tarjetaActiva = idTarjetaActiva === cliente.id_cliente;
-
             return (
               <Card
                 key={cliente.id_cliente}
-                className="mb-3 border-0 rounded-3 shadow-sm w-100 tarjeta-categoria-contenedor"
+                className="mb-3 border-0 rounded-3 shadow-sm w-100 tarjeta-cliente-contenedor"
                 onClick={() => alternarTarjetaActiva(cliente.id_cliente)}
                 tabIndex={0}
                 onKeyDown={(evento) => {
@@ -51,38 +50,30 @@ const TarjetaCliente = ({
                     alternarTarjetaActiva(cliente.id_cliente);
                   }
                 }}
-                aria-label={`Cliente ${cliente.nombre}`}
+                aria-label={`Cliente ${cliente.nombre_cliente}`}
               >
                 <Card.Body
-                  className={`p-2 tarjeta-categoria-cuerpo ${
+                  className={`p-2 tarjeta-cliente-cuerpo ${
                     tarjetaActiva
-                      ? "tarjeta-categoria-cuerpo-activo"
-                      : "tarjeta-categoria-cuerpo-inactivo"
+                      ? "tarjeta-cliente-cuerpo-activo"
+                      : "tarjeta-cliente-cuerpo-inactivo"
                   }`}
                 >
                   <Row className="align-items-center gx-3">
                     <Col xs={2} className="px-2">
-                      <div
-                        className="bg-light d-flex align-items-center justify-content-center rounded tarjeta-categoria-placeholder-imagen"
-                      >
-                        <i className="bi bi-person text-muted fs-3"></i>
+                      <div className="bg-light d-flex align-items-center justify-content-center rounded tarjeta-cliente-placeholder-imagen">
+                        <i className="bi bi-person-circle text-muted fs-3"></i>
                       </div>
                     </Col>
-
-                    <Col xs={5} className="text-start">
+                    <Col xs={6} className="text-start">
                       <div className="fw-semibold text-truncate">
-                        {cliente.nombre} {cliente.apellido}
+                        {cliente.nombre_cliente} {cliente.apellido_cliente}
                       </div>
                       <div className="small text-muted text-truncate">
-                        <i className="bi bi-telephone me-1"></i>
                         {cliente.celular}
                       </div>
                     </Col>
-
-                    <Col
-                      xs={5}
-                      className="d-flex flex-column align-items-end justify-content-center text-end"
-                    >
+                    <Col xs={4} className="text-end">
                       <div className="fw-semibold small text-success">Activo</div>
                     </Col>
                   </Row>
@@ -92,14 +83,11 @@ const TarjetaCliente = ({
                   <div
                     role="dialog"
                     aria-modal="true"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIdTarjetaActiva(null);
-                    }}
-                    className="tarjeta-categoria-capa"
+                    onClick={(e) => e.stopPropagation()}
+                    className="tarjeta-cliente-capa"
                   >
                     <div
-                      className="d-flex gap-2 tarjeta-categoria-botones-capa"
+                      className="d-flex gap-2 tarjeta-cliente-botones-capa"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Button
@@ -109,11 +97,9 @@ const TarjetaCliente = ({
                           abrirModalEdicion(cliente);
                           setIdTarjetaActiva(null);
                         }}
-                        aria-label={`Editar ${cliente.nombre}`}
                       >
                         <i className="bi bi-pencil"></i>
                       </Button>
-
                       <Button
                         variant="outline-danger"
                         size="sm"
@@ -121,7 +107,6 @@ const TarjetaCliente = ({
                           abrirModalEliminacion(cliente);
                           setIdTarjetaActiva(null);
                         }}
-                        aria-label={`Eliminar ${cliente.nombre}`}
                       >
                         <i className="bi bi-trash"></i>
                       </Button>

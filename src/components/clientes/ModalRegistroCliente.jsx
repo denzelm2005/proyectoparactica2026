@@ -26,38 +26,40 @@ const ModalRegistroCliente = ({
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title>Agregar Cliente</Modal.Title>
+        <Modal.Title>Agregar Nuevo Cliente</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <Form.Group className="mb-3">
-            <Form.Label>Nombre</Form.Label>
+            <Form.Label>Nombre *</Form.Label>
             <Form.Control
               type="text"
-              name="nombre"
-              value={nuevoCliente.nombre}
+              name="nombre_cliente"
+              value={nuevoCliente.nombre_cliente}
               onChange={manejoCambioInput}
               placeholder="Ingresa el nombre"
             />
           </Form.Group>
+
           <Form.Group className="mb-3">
             <Form.Label>Apellido</Form.Label>
             <Form.Control
               type="text"
-              name="apellido"
-              value={nuevoCliente.apellido}
+              name="apellido_cliente"
+              value={nuevoCliente.apellido_cliente}
               onChange={manejoCambioInput}
               placeholder="Ingresa el apellido"
             />
           </Form.Group>
+
           <Form.Group className="mb-3">
-            <Form.Label>Celular</Form.Label>
+            <Form.Label>Celular *</Form.Label>
             <Form.Control
-              type="text"
+              type="tel"
               name="celular"
               value={nuevoCliente.celular}
               onChange={manejoCambioInput}
-              placeholder="Ingresa el número de celular"
+              placeholder="Ej: 505 1234 5678"
             />
           </Form.Group>
         </Form>
@@ -69,9 +71,9 @@ const ModalRegistroCliente = ({
         <Button
           variant="primary"
           onClick={handleRegistrar}
-          disabled={nuevoCliente.nombre.trim() === "" || deshabilitado}
+          disabled={!nuevoCliente.nombre_cliente.trim() || !nuevoCliente.celular.trim() || deshabilitado}
         >
-          {deshabilitado ? "Guardando..." : "Guardar"}
+          Guardar Cliente
         </Button>
       </Modal.Footer>
     </Modal>
