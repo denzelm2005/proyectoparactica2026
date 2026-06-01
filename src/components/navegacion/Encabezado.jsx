@@ -6,6 +6,8 @@ import { supabase } from "../../database/supabaseconfig";
 // Importar el hook de autenticación
 import { useAuth } from "../../context/AuthContext";
 
+import ChatIA from "../ia/ChatIA";
+
 const Encabezado = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const navigate = useNavigate();
@@ -13,6 +15,8 @@ const Encabezado = () => {
 
   // Desestructurar la lógica para verificar permisos, cierre de sesión y usuario autenticado
   const { tienePermiso, logout, usuario } = useAuth();
+
+  const [mostrarChatIA, setMostrarChatIA] = useState(false);
 
   const manejarToggle = () => setMostrarMenu(!mostrarMenu);
 
@@ -153,6 +157,10 @@ const Encabezado = () => {
               <strong>Ventas</strong>
             </Nav.Link>
           )}
+
+           <Nav.Link onClick={() => setMostrarChatIA(true)} className="text-white">
+        <i className="bi bi-robot me-2"></i>
+      </Nav.Link>
           <hr />
 
           {/* Ícono cerrar sesión en barra superior */}
@@ -197,6 +205,9 @@ const Encabezado = () => {
           className="text-black fw-bold d-flex align-items-center"
           style={{ cursor: "pointer" }}
         >
+
+<ChatIA mostrar={mostrarChatIA} onCerrar={() => setMostrarChatIA(false)} />
+
           <img
             alt=""
             src={logo}
