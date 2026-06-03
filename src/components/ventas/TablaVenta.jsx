@@ -1,7 +1,7 @@
 import React from "react";
 import { Table, Button } from "react-bootstrap";
 
-const TablaVentas = ({ ventas, abrirEdicion }) => {
+const TablaVentas = ({ ventas, abrirEdicion, imprimirVenta }) => {
   return (
     <Table striped hover responsive size="sm">
       <thead>
@@ -31,8 +31,22 @@ const TablaVentas = ({ ventas, abrirEdicion }) => {
             </td>
             <td className="text-end fw-bold">C$ {parseFloat(venta.total || 0).toFixed(2)}</td>
             <td className="text-center">
-              <Button variant="outline-warning" size="sm" onClick={() => abrirEdicion(venta)}>
+              <Button 
+                variant="outline-warning" 
+                size="sm" 
+                onClick={() => abrirEdicion(venta)}
+                className="me-2"
+                title="Editar Venta"
+              >
                 <i className="bi bi-pencil"></i>
+              </Button>
+              <Button 
+                variant="outline-secondary" 
+                size="sm" 
+                onClick={() => imprimirVenta(venta)}
+                title="Imprimir Ticket"
+              >
+                <i className="bi bi-printer"></i>
               </Button>
             </td>
           </tr>

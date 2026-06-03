@@ -5,6 +5,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 const TarjetaVenta = ({
   ventas,
   abrirEdicion,
+  imprimirVenta,
 }) => {
   const [cargando, setCargando] = useState(true);
   const [idTarjetaActiva, setIdTarjetaActiva] = useState(null);
@@ -92,6 +93,16 @@ const TarjetaVenta = ({
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => {
+                          imprimirVenta(venta);
+                          setIdTarjetaActiva(null);
+                        }}
+                      >
+                        <i className="bi bi-printer"></i>
+                      </Button>
+                      <Button
                         variant="outline-warning"
                         size="sm"
                         onClick={() => {
@@ -112,5 +123,5 @@ const TarjetaVenta = ({
     </>
   );
 };
-
+ 
 export default TarjetaVenta;
