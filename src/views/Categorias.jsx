@@ -217,6 +217,31 @@ emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
     }
   };
 
+  const copiarCategoria = async (categoria) => {
+    if (!categoria) return;
+
+    const texto = `
+ID: ${categoria.id_categoria}
+Categoría: ${categoria.nombre_categoria}
+Descripción: ${categoria.descripcion_categoria || 'Sin descripción'}`;
+
+    try {
+        await navigator.clipboard.writeText(texto);
+        setToast({
+            mostrar: true,
+            mensaje: `Categoría "${categoria.nombre_categoria}" copiada al portapapeles`,
+            tipo: "exito",
+        });
+    } catch (err) {
+        console.error("Error al copiar:", err);
+        setToast({
+            mostrar: true,
+            mensaje: "No se pudo copiar al portapapeles",
+            tipo: "error",
+        });
+    }
+};
+
   // --- Hook para Filtrado en tiempo real ---
   useEffect(() => {
     if (!textoBusqueda.trim()) {
@@ -379,6 +404,7 @@ emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
               categorias={categoriasPaginadas}
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
+              copiarCategoria={copiarCategoria}
             />
           </Col>
 
@@ -389,6 +415,7 @@ emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
               generarPDFCategoria={generarPDFCategoria}
+              copiarCategoria={copiarCategoria}
 
             />
           </Col>

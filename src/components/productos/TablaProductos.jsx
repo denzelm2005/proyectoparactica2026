@@ -5,7 +5,9 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 const TablaProductos = ({
   productos,
   abrirModalEdicion,
-  abrirModalEliminacion
+  abrirModalEliminacion,
+  copiarProducto, 
+  generarQRImagen
 }) => {
 
   const [loading, setLoading] = useState(true);
@@ -80,6 +82,28 @@ const TablaProductos = ({
                   >
                     <i className="bi bi-trash"></i>
                   </Button>
+                  <Button 
+    variant="outline-success" 
+    size="sm" 
+    className="m-1" 
+    onClick={() => copiarProducto(producto)} 
+    title="Copiar datos al portapapeles"
+>
+    <i className="bi bi-clipboard"></i>
+</Button>
+
+<Button 
+    variant="outline-primary" 
+    size="sm" 
+    onClick={() => {
+        generarQRImagen(producto);
+        setIdTarjetaActiva(null);
+    }} 
+    title="Generar código QR de la imagen"
+>
+    <i className="bi bi-qr-code"></i>
+</Button>
+
                 </td>
               </tr>
             ))}

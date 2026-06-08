@@ -5,7 +5,8 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 const TarjetaCategoria = ({
   categorias,
   abrirModalEdicion,
-  abrirModalEliminacion
+  abrirModalEliminacion,
+  copiarCategoria // <--- Agrega esto aquí
 }) => {
 
     const [cargando, setCargando] = useState(true);
@@ -125,6 +126,17 @@ const alternarTarjetaActiva = (id) => {
                 >
                   <i className="bi bi-trash"></i>
                 </Button>
+
+<Button 
+    variant="outline-success" 
+    size="sm" 
+    className="m-1" 
+    onClick={() => copiarCategoria(categoria)} 
+    title="Copiar al portapapeles"
+>
+    <i className="bi bi-clipboard"></i>
+</Button>
+
               </div>
             </div>
           )}
